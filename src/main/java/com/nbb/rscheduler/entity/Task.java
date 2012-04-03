@@ -7,6 +7,15 @@ public class Task {
 	private String name;
 	private String bean;
 	private String method;
+	private Short retries;
+	public Short getRetries() {
+		return retries;
+	}
+
+	public void setRetries(Short retries) {
+		this.retries = retries;
+	}
+
 	public String getBean() {
 		return bean;
 	}

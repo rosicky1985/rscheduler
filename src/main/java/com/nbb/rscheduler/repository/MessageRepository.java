@@ -9,4 +9,6 @@ public interface MessageRepository {
 
 	public Set<Message> getMessages(Execution exe);
 
+	public void submit(Message message);
+
 }
