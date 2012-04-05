@@ -6,8 +6,6 @@ import com.nbb.rscheduler.entity.Task;
 
 public interface TaskRepository {
 
-	public Set<Task> getLeafTasks();
-
 	public Set<Task> getTopTasks();
 
 }

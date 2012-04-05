@@ -7,7 +7,14 @@ public class Task {
 	private String name;
 	private String bean;
 	private String method;
-	private Short retries;
+	private Short retries;//TODO
+	public Task(String name) {
+		// TODO Auto-generated constructor stub
+	}
+	public Task(){
+		
+	}
+
 	public Short getRetries() {
 		return retries;
 	}

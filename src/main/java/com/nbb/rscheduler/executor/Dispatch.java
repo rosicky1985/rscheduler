@@ -1,6 +1,7 @@
 package com.nbb.rscheduler.executor;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import com.nbb.rscheduler.entity.Execution;
@@ -16,12 +17,9 @@ public class Dispatch extends Thread {
 	private TaskRepository taskRepository;
 	private TaskExecutor taskExetutor;
 	private long dispatchInterval;
-	;
-
 
 	@Override
 	public void run() {
-		Set<Task> topTasks = taskRepository.getTopTasks();
 		while (true) {
 			Set<Execution> unresolvedExecutions = executionRepository
 					.getUnresolveExecution();
@@ -30,7 +28,6 @@ public class Dispatch extends Thread {
 				try {
 					Thread.sleep(dispatchInterval);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
 				}
@@ -39,11 +36,7 @@ public class Dispatch extends Thread {
 					if (exe != null) {
 						Set<Message> messages = messageRepository
 								.getMessages(exe);
-						if (topTasks != null && topTasks.size() != 0) {
-							for (Task task : topTasks) {
-								findTodo(todo, task, messages);
-							}
-						}
+						findTodoByExecution(todo, messages);
 					}
 					if (todo != null && todo.size() != 0) {
 						taskExetutor.executeTask(todo, exe);
@@ -54,7 +47,55 @@ public class Dispatch extends Thread {
 		}
 	}
 
-	private void findTodo(Set<Task> todo, Task task, Set<Message> messages) {
+	public MessageRepository getMessageRepository() {
+		return messageRepository;
+	}
+
+	public void setMessageRepository(MessageRepository messageRepository) {
+		this.messageRepository = messageRepository;
+	}
+
+	public ExecutionRepository getExecutionRepository() {
+		return executionRepository;
+	}
+
+	public void setExecutionRepository(ExecutionRepository executionRepository) {
+		this.executionRepository = executionRepository;
+	}
+
+	public TaskRepository getTaskRepository() {
+		return taskRepository;
+	}
+
+	public void setTaskRepository(TaskRepository taskRepository) {
+		this.taskRepository = taskRepository;
+	}
+
+	public TaskExecutor getTaskExetutor() {
+		return taskExetutor;
+	}
+
+	public void setTaskExetutor(TaskExecutor taskExetutor) {
+		this.taskExetutor = taskExetutor;
+	}
+
+	public long getDispatchInterval() {
+		return dispatchInterval;
+	}
+
+	public void setDispatchInterval(long dispatchInterval) {
+		this.dispatchInterval = dispatchInterval;
+	}
+
+	public void findTodoByExecution(Set<Task> todo, Set<Message> messages) {
+		if (taskRepository.getTopTasks() != null && taskRepository.getTopTasks().size() != 0) {
+			for (Task task : taskRepository.getTopTasks()) {
+				findTodo(todo, task, messages);
+			}
+		}
+	}
+
+	public void findTodo(Set<Task> todo, Task task, Set<Message> messages) {
 		if (task != null) {
 			Message taskmessage = findMessageByTask(task, messages);
 			if (taskmessage == null && task.getRequired() != null
@@ -81,7 +122,15 @@ public class Dispatch extends Thread {
 	}
 
 	private Message findMessageByTask(Task task, Set<Message> messages) {
-		// TODO Auto-generated method stub
+		if (messages == null || messages.size() == 0)
+			return null;
+		Iterator<Message> itr = messages.iterator();
+		while (itr.hasNext()) {
+			Message message = itr.next();
+			if (task.equals(message.getTask())) {
+				return message;
+			}
+		}
 		return null;
 	}
 }
